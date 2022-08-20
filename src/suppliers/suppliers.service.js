@@ -19,8 +19,13 @@ function update(updatedSupplier) {
         .then((updatedRecords) => updatedRecords[0]);
 }
 
+function destroy(supplier_id) {
+    return knex("suppliers").where({ supplier_id }).del();
+}
+
 module.exports = {
     create,
     read,
     update,
+    delete: destroy,
 }
