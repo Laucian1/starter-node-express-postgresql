@@ -1,16 +1,5 @@
-const products = require("../db/fixtures/products");
-const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 const productsService = require("./products.service");
-
-function read(req, res, next) {
-  const { product: data } = res.locals;
-  res.json({ data });
-}
-
-async function list(req, res, next) {
-  const data = await productsService.list();
-  res.json({ data });
-}
+const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
 async function productExists(req, res, next) {
   const product = await productsService.read(req.params.productId);
@@ -21,7 +10,17 @@ async function productExists(req, res, next) {
   next({ status: 404, message: `Product cannot be found.`});
 }
 
+function read(req, res) {
+  const { product: data } = res.locals;
+  res.json({ data });
+}
+
+async function list(req, res) {
+  const data = await productsService.list();
+  res.json({ data });
+}
+
 module.exports = {
-  read: [asyncErrorBoundary(productExists), read],
+  read: [asyncErrorBoundary(productExists), asyncErrorBoundary(read)],
   list: asyncErrorBoundary(list),
 };
