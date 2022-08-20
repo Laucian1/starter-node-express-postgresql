@@ -1,6 +1,5 @@
 const suppliersService = require("./suppliers.service");
 const hasProperties = require("../errors/hasProperties");
-const hasRequiredProperties = hasProperties("supplier_name", "supplier_email");
 
 const VALID_PROPERTIES = [
   "supplier_name",
@@ -15,7 +14,7 @@ const VALID_PROPERTIES = [
   "supplier_type_of_goods",
 ];
 
-function hasOnlyValidProperties(req, res, nest) {
+function hasOnlyValidProperties(req, res, next) {
   const { data = {} } = req.body;
 
   const invalidFields = Object.keys(data).filter(
@@ -31,7 +30,9 @@ function hasOnlyValidProperties(req, res, nest) {
   next();
 }
 
-async function create(req, res, next) {
+const hasRequiredProperties = hasProperties("supplier_name", "supplier_email");
+
+function create(req, res, next) {
   suppliersService  
     .create(req.body.data)
     .then((data) => res.status(201).json({ data }))
@@ -47,7 +48,7 @@ async function destroy(req, res, next) {
 }
 
 module.exports = {
-  create,
+  create: [hasOnlyValidProperties, hasRequiredProperties, create],
   update,
   delete: destroy,
 };
