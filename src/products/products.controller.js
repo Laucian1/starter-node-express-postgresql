@@ -1,4 +1,5 @@
 const products = require("../db/fixtures/products");
+const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 const productsService = require("./products.service");
 
 function read(req, res, next) {
@@ -21,6 +22,6 @@ async function productExists(req, res, next) {
 }
 
 module.exports = {
-  read: [productExists, read],
-  list,
+  read: [asyncErrorBoundary(productExists), read],
+  list: asyncErrorBoundary(list),
 };
